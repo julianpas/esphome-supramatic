@@ -8,6 +8,7 @@ Since my garage door uses the SupraMatic E4 drive by Hoermann I wanted to not on
 2. 9 x 1kΩ resistors
 3. 6 x 2N3904 NPN transistors
 4. 1 x 24V DC to 5V DC USB converter
+5. [Hoermann UAP1-HCP](docs/UAP1-HCP.pdf)
 
 ## Schematic
 
