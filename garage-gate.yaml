@@ -1,0 +1,137 @@
+esphome:
+  name: garage-gate
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+switch:
+  - platform: gpio
+    id: open_switch
+    pin: GPIO23
+    name: "Open Garage Gate"
+    icon: "mdi:arrow-up-bold-box"
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: open_switch
+    interlock: &interlock_group [open_switch, close_switch, stop_switch, halfopen_switch, ventilation_switch]
+  - platform: gpio
+    id: close_switch
+    pin: GPIO22
+    name: "Close Garage Gate"
+    icon: "mdi:arrow-down-bold-box"
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: close_switch
+    interlock: *interlock_group
+  - platform: gpio
+    id: stop_switch
+    pin: GPIO17
+    name: "Stop Garage Gate"
+    icon: "mdi:close-octagon"
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: stop_switch
+    interlock: *interlock_group
+  - platform: gpio
+    id: halfopen_switch
+    pin: GPIO16
+    name: "Half-open Position"
+    icon: "mdi:format-vertical-align-center"
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: halfopen_switch
+    interlock: *interlock_group
+  - platform: gpio
+    id: ventilation_switch
+    pin: GPIO19
+    name: "Ventilation Position"
+    icon: "mdi:air-filter"
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: ventilation_switch
+    interlock: *interlock_group
+  - platform: gpio
+    id: light_switch
+    pin: GPIO18
+    name: "Gate Light"
+    icon: "mdi:alarm-light"
+    on_turn_on:
+    - delay: 5min
+    - switch.turn_off: light_switch
+    
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO27
+      mode:
+        input: true
+        pullup: true
+    name: "Open Position"
+    id: open_endstop_sensor
+    filters:
+      - invert:
+  - platform: gpio
+    pin:
+      number: GPIO26
+      mode:
+        input: true
+        pullup: true
+    name: "Close Position"
+    id: close_endstop_sensor
+    filters:
+      - invert:
+  - platform: gpio
+    pin:
+      number: GPIO25
+      mode:
+        input: true
+        pullup: true
+    name: "Lamp On"
+    id: lamp_on_sensor
+    filters:
+      - invert:
+
+cover:
+  - platform: endstop
+    name: "Garage Gate"
+    id: garage_gate_cover
+    device_class: garage
+
+    open_action:
+      - switch.turn_on: open_switch
+    open_duration: 14sec
+    open_endstop: open_endstop_sensor
+
+    close_action:
+      - switch.turn_on: close_switch
+    close_duration: 28sec
+    close_endstop: close_endstop_sensor
+
+    stop_action:
+      - switch.turn_on: stop_switch
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret garage_gate_encryption_key
+
+ota:
+  password: !secret garage_gate_ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Garage-Gate Fallback Hotspot"
+    password: !secret garage_gate_ap_password
+
+captive_portal:
+    
