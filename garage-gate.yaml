@@ -9,6 +9,34 @@ esp32:
 # Enable logging
 logger:
 
+sensor:
+  - platform: template
+    name: "Door Position"
+    unit_of_measurement: "%"
+    state_class: measurement
+    id: ble_door_pos_sensor
+    filters:
+      - or:
+        - throttle: 10s
+        - delta: 1.0
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 100ms
+    window: 80ms
+    duration: 5s
+  on_ble_advertise:
+    mac_address: DE:AD:BA:BE:55:55
+    then:
+      - lambda: |-
+          for (auto data : x.get_manufacturer_datas()) {
+            if (data.data.size() != 17) {
+              continue;
+            }  
+            int value = data.data[1] / 2;
+            id(ble_door_pos_sensor).publish_state(value);
+          }
+
 switch:
   - platform: gpio
     id: open_switch
