@@ -33,3 +33,10 @@ This is project requered no custom code as all pins are trivially GPIO driven. T
 
 Position control is very imprecise because the time to close is dominated by the warning time of the drive when it blinks its light but doesn't move.
 
+## BLE Status Updates
+
+I was about to proudly present my project on the HomeAssistant forum when I found [this thread](https://community.home-assistant.io/t/hormann-garage-door-via-mqtt/279938) which made me hide back in my hole with shame that while I was toying with the UAP1 board folks have reverse engineered the bus protocol that the door motor uses to talk to this board and get all the fine details and precise control one could wish for. I will likely use this threasure throve in the future too but in the mean time one [particular post](https://community.home-assistant.io/t/hormann-garage-door-via-mqtt/279938/83) there caught my attention. It was the discovery that if Bluetooth is enabled on the motor it constantly broadcasts the door status. And since all I was really missing was the precise door position and it is actually present in this stream I have now a solution that at least for me does all I care about.
+
+## Outstanding Work
+
+Connect the door position from the BLE Tracker to the Cover control to enable more precise position feedback.
